@@ -1,6 +1,15 @@
-from machine import Pin
+import board
+import digitalio
 import time
 
+button = digitalio.DigitalInOut(board.GP28)
+digitalio.DigitalInOut(board.GP28).switch_to_input(pull=digitalio.Pull.UP)
+
+while True:
+    print(button.value)
+    time.sleep(0.1)
+    
+"""
 pin_mapping = {
     28: 'z',
     21: 'h',
@@ -40,11 +49,5 @@ while True:
                 while pin.value() == 0:
                     pass
             else:
-                print("Pressed mod key")
-    
-            
-            
-            
-            
-            
-            
+                print("Pressed mod")
+"""
