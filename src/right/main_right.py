@@ -10,8 +10,8 @@ clock_pin.direction = digitalio.Direction.INPUT
 data_pin = digitalio.DigitalInOut(board.GP5)
 data_pin.direction = digitalio.Direction.INPUT
 
-freq = 10 # communication frequency in bits/second
-
+freq = 1 # communication frequency in bits/second
+"""
 def receive_data(freq):
      # if there is no new clock cycle for 1.5 estimated cycles, communication is probably over
     TIMEOUT = 1.5 * (1 / freq) * 10**9  # in nanoseconds
@@ -34,7 +34,15 @@ def receive_data(freq):
                     communication_end = True
     binary_str = ''.join('1' if bit else '0' for bit in bits)
     return int(binary_str, 2)
-
+"""
 while True:
     if clock_pin.value:
-        print(receive_data(freq))
+        clock = 1
+    else:
+        clock = 0
+    if data_pin.value:
+        data = 1
+    else:
+        data = 0
+    print(clock, data)
+    time.sleep(0.1)
