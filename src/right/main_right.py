@@ -2,32 +2,27 @@ import board
 import digitalio
 import time
 
-# Setup for GPIO5 as input
-gpio5 = digitalio.DigitalInOut(board.GP5)
-gpio5.direction = digitalio.Direction.INPUT
+clock_pin = digitalio.DigitalInOut(board.GP4)
+clock_pin.direction = digitalio.Direction.INPUT
 
-def received_number():
-    """
-    Receives the number sent by the left Pico.
-    :return: Received number
-    """
-    # Wait for GPIO5 to go high
-    while not gpio5.value:
-        time.sleep(0.001)
-    
-    # Start counting the toggles
-    count = 0
-    start_time = time.time()
-    while time.time() - start_time < 0.05:  # Monitor for 50 milliseconds
-        if gpio5.value:
-            count += 1
-            while gpio5.value:
-                pass  # Wait for the pin to go low
-    
-    return count
+data_pin = digitalio.DigitalInOut(board.GP5)
+data_pin.direction = digitalio.Direction.INPUT
 
-# Example usage: receive number
+freq = 1000000000 # communication frequency in hz
+# function to receive data from the other Pico
+def receive_data(freq):
+    received_number = 0
+    for i in range(5):
+        while not clock_pin.value:
+            pass
+        time.sleep(1/freq*0.25)
+        bit = data_pin.value
+        received_number |= (bit << i)
+        time.sleep(1/freq*0.5)
+    return received_number
+
 while True:
-    if gpio5.value:
-        received_num = received_number()
-        print("Received number:", received_num)
+    if clock_pin.value:
+        data = receive_data(freq)
+        print("Data:", data)
+    

@@ -2,34 +2,35 @@ import board
 import digitalio
 import time
 
-# Setup for GPIO5 as output
-gpio5 = digitalio.DigitalInOut(board.GP5)
-gpio5.direction = digitalio.Direction.OUTPUT
+clock_pin = digitalio.DigitalInOut(board.GP4)
+clock_pin.direction = digitalio.Direction.OUTPUT
 
-def send_number(number):
-    """
-    Send a number by toggling the GPIO5 pin.
-    :param number: Number between 0-25
-    """
-    assert 0 <= number <= 25, "Number must be between 0 and 25"
-    
-    # Pull GPIO5 high to signal start of transmission
-    gpio5.value = True
-    time.sleep(0.01)  # Ensure the signal is high for a short duration
-    
-    # Send the number by toggling the GPIO5 pin
-    gpio5.value = False
-    for _ in range(number):
-        gpio5.value = True
-        time.sleep(0.0005)  # 1000 Hz frequency, half period
-        gpio5.value = False
-        time.sleep(0.0005)  # 1000 Hz frequency, half period
-    
-    # End of transmission
-    gpio5.value = False
+data_pin = digitalio.DigitalInOut(board.GP5)
+data_pin.direction = digitalio.Direction.OUTPUT
 
+trigger_pin = digitalio.DigitalInOut(board.GP2)
+trigger_pin.direction = digitalio.Direction.INPUT
+trigger_pin.pull = digitalio.Pull.UP
+
+led_pin = digitalio.DigitalInOut(board.GP25)
+led_pin.direction = digitalio.Direction.OUTPUT
+
+freq = 1000000000 # communication frequency in hz
+    
+# function to send any number to the other Pico
+# 5 = 10100
+def send_data(number, freq):
+    for i in range(5):
+        bit = (number >> i) & 0x01
+        clock_pin.value = True
+        data_pin.value = bit
+        time.sleep(1/freq*0.5)
+        clock_pin.value = False
+        time.sleep(1/freq*0.5)
+        
 while True:
-    for i in range(5, 25):
-        print("sending:", i)
-        send_number(i)
-        time.sleep(5)
+    while trigger_pin.value:
+        pass
+    send_data(27, freq)
+    time.sleep(0.5)
+
