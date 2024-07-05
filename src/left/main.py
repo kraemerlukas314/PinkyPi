@@ -70,4 +70,3 @@ while True:
 
   # Add a small delay to avoid excessive loop frequency
   time.sleep(0.01)
-

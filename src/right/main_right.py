@@ -53,30 +53,29 @@ key_map_right = {
 }
 
 key_map_left = {
-    "L26": (Keycode.ESCAPE, False),
-    "L27": (Keycode.TAB, False), # tab
-    "L28": (Keycode.TAB, False), # <
-    "L22": (Keycode.Q, False),
-    "L21": (Keycode.A, False),
-    "L15": (Keycode.Y, False),
-    "L20": (Keycode.W, False),
-    "L10": (Keycode.S, False),
-    "L14": (Keycode.X, False),
-    "L6": (Keycode.E, False),
-    "L7": (Keycode.D, False),
-    "L13": (Keycode.C, False),
-    "L3": (Keycode.R, False),
-    "L9": (Keycode.F, False),
-    "L12": (Keycode.V, False),
-    "L2": (Keycode.T, False),
-    "L8": (Keycode.G, False),
-    "L11": (Keycode.B, False),
-    "L18": (Keycode.ALT, False), # unten links
-    "L17": (227, False), # windows key
-    "L16": (227, False),
-    "L19": (227, False)
+    "26": (Keycode.ESCAPE, False),
+    "27": (Keycode.TAB, False), # tab
+    "28": (Keycode.TAB, False), # <
+    "22": (Keycode.Q, False),
+    "21": (Keycode.A, False),
+    "15": (Keycode.Y, False),
+    "20": (Keycode.W, False),
+    "10": (Keycode.S, False),
+    "14": (Keycode.X, False),
+    "6": (Keycode.E, False),
+    "7": (Keycode.D, False),
+    "13": (Keycode.C, False),
+    "3": (Keycode.R, False),
+    "9": (Keycode.F, False),
+    "12": (Keycode.V, False),
+    "2": (Keycode.T, False),
+    "8": (Keycode.G, False),
+    "11": (Keycode.B, False),
+    "18": (Keycode.ALT, False), # unten links
+    "17": (227, False), # windows key
+    "16": (227, False),
+    "19": (227, False)
 }
-
 # Initialize all pins as input with pull-up resistors
 for pin_string in key_map_right.keys():
     pin_number = "GP" + pin_string[1:]
@@ -88,8 +87,12 @@ for pin_string in key_map_right.keys():
 
 while True:
     if clock_pin.value:
-        data = receive_data(freq)
-        print(data)
+        data = str(receive_data(freq))
+        key = key_map_left[str(data)][0]
+        kbd.press(key)
+        time.sleep(0.02)
+        kbd.release(key)das ist ein kleiner test
+        
 
     for pin_string, (pin, keycode, pressed) in key_map_right.items():
         if not pin.value:  # Pin is active low
@@ -102,17 +105,5 @@ while True:
                 print(f"Pin {pin_string} released, keycode: {keycode}")
                 kbd.release(keycode)
                 key_map_right[pin_string] = (pin, keycode, False)
-    """
-    if (data_pin.value):
-        if (clock_pin.value):
-            print(1, 1)
-        else:
-            print(0, 1)
-    else:
-        if (clock_pin.value):
-            print(1, 0)
-        else:
-            print(0, 0)
-    time.sleep(0.1)
-    """
+    
     
