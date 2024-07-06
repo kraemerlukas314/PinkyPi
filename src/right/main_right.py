@@ -7,6 +7,8 @@ from adafruit_hid.keycode import Keycode
 
 kbd = Keyboard(usb_hid.devices)
 
+# for more information about key mapping refer to:
+# https://usb.org/sites/default/files/hut1_21_0.pdf#page=83
 key_map_right = {
     # PIN: (Keycode to press, already Pressed?, timestamp when it was pressed in ns)
     "28": (Keycode.Z, False, 0),
@@ -17,7 +19,7 @@ key_map_right = {
     "16": (Keycode.M, False, 0),
     "26": (Keycode.I, False, 0),
     "20": (Keycode.K, False, 0),
-    "18": (54, False, 0),
+    "18": (54, False, 0),das ist 
     "22": (Keycode.O, False, 0),
     "7": (Keycode.L, False, 0),
     "6": (55, False, 0),
@@ -27,10 +29,10 @@ key_map_right = {
     "2": (Keycode.U, False, 0),  # Ü
     "8": (Keycode.A, False, 0),  # Ä
     "10": (57, False, 0),
-    "11": (57, False, 0),  # placeholder
+    "11": (76, False, 0),
     "13": (Keycode.CONTROL, False, 0),
-    "14": (42, False, 0),
-    "12": (44, False, 0)
+    "14": (Keycode.ALT, False, 0),
+    "12": (Keycode.RETURN, False, 0)
 }
 
 # Initialize all pins as input with pull-up resistors

@@ -10,7 +10,7 @@ kbd = Keyboard(usb_hid.devices)
 key_map_left = {
     "26": (Keycode.ESCAPE, False, 0),
     "27": (Keycode.TAB, False, 0), # tab
-    "28": (Keycode.TAB, False, 0), # <
+    "28": (100, False, 0),
     "22": (Keycode.Q, False, 0),
     "21": (Keycode.A, False, 0),
     "15": (Keycode.Y, False, 0),
@@ -26,14 +26,14 @@ key_map_left = {
     "2": (Keycode.T, False, 0),
     "8": (Keycode.G, False, 0),
     "11": (Keycode.B, False, 0),
-    "18": (Keycode.ALT, False, 0), # unten links
-    "17": (227, False, 0), # windows key
-    "16": (227, False, 0),
+    "18": (42, False, 0),
+    "17": (44, False, 0),
+    "16": (225, False, 0),
     "19": (227, False, 0)
 }
 
 # Initialize all pins as input with pull-up resistors
-for pin_string in key_map_left.keys():ffgghallo das ist ein kleiner test
+for pin_string in key_map_left.keys():
     pin_number = "GP" + pin_string
     pin = getattr(board, pin_number)
     pin = digitalio.DigitalInOut(pin)
