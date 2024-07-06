@@ -5,105 +5,58 @@ import usb_hid
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 
-clock_pin = digitalio.DigitalInOut(board.GP4)
-clock_pin.direction = digitalio.Direction.INPUT
-
-data_pin = digitalio.DigitalInOut(board.GP5)
-data_pin.direction = digitalio.Direction.INPUT
-
-freq = 100  # communication frequency in Hz
-
 kbd = Keyboard(usb_hid.devices)
 
-# Function to receive data from the other Pico
-def receive_data(freq):
-    received_number = 0
-    for i in range(5):
-        while not clock_pin.value:
-            pass
-        time.sleep(1 / freq * 0.25)
-        bit = data_pin.value
-        received_number |= (bit << i)
-        time.sleep(1 / freq * 0.5)
-    return received_number
-
 key_map_right = {
-    "R28": (Keycode.Z, False),
-    "R21": (Keycode.H, False),
-    "R17": (Keycode.N, False),
-    "R27": (Keycode.U, False),
-    "R19": (Keycode.J, False),
-    "R16": (Keycode.M, False),
-    "R26": (Keycode.I, False),
-    "R20": (Keycode.K, False),
-    "R18": (54, False),
-    "R22": (Keycode.O, False),
-    "R7": (Keycode.L, False),
-    "R6": (55, False),
-    "R3": (Keycode.P, False),
-    "R9": (Keycode.O, False),  # Ö
-    "R15": (Keycode.MINUS, False),
-    "R2": (Keycode.U, False),  # Ü
-    "R8": (Keycode.A, False),  # Ä
-    "R10": (57, False),
-    "R11": (57, False),  # placeholder
-    "R13": (Keycode.CONTROL, False),
-    "R14": (42, False),
-    "R12": (44, False)
+    # PIN: (Keycode to press, already Pressed?, timestamp when it was pressed in ns)
+    "28": (Keycode.Z, False, 0),
+    "21": (Keycode.H, False, 0),
+    "17": (Keycode.N, False, 0),
+    "27": (Keycode.U, False, 0),
+    "19": (Keycode.J, False, 0),
+    "16": (Keycode.M, False, 0),
+    "26": (Keycode.I, False, 0),
+    "20": (Keycode.K, False, 0),
+    "18": (54, False, 0),
+    "22": (Keycode.O, False, 0),
+    "7": (Keycode.L, False, 0),
+    "6": (55, False, 0),
+    "3": (Keycode.P, False, 0),
+    "9": (Keycode.O, False, 0),  # Ö
+    "15": (Keycode.MINUS, False, 0),
+    "2": (Keycode.U, False, 0),  # Ü
+    "8": (Keycode.A, False, 0),  # Ä
+    "10": (57, False, 0),
+    "11": (57, False, 0),  # placeholder
+    "13": (Keycode.CONTROL, False, 0),
+    "14": (42, False, 0),
+    "12": (44, False, 0)
 }
 
-key_map_left = {
-    "26": (Keycode.ESCAPE, False),
-    "27": (Keycode.TAB, False), # tab
-    "28": (Keycode.TAB, False), # <
-    "22": (Keycode.Q, False),
-    "21": (Keycode.A, False),
-    "15": (Keycode.Y, False),
-    "20": (Keycode.W, False),
-    "10": (Keycode.S, False),
-    "14": (Keycode.X, False),
-    "6": (Keycode.E, False),
-    "7": (Keycode.D, False),
-    "13": (Keycode.C, False),
-    "3": (Keycode.R, False),
-    "9": (Keycode.F, False),
-    "12": (Keycode.V, False),
-    "2": (Keycode.T, False),
-    "8": (Keycode.G, False),
-    "11": (Keycode.B, False),
-    "18": (Keycode.ALT, False), # unten links
-    "17": (227, False), # windows key
-    "16": (227, False),
-    "19": (227, False)
-}
 # Initialize all pins as input with pull-up resistors
 for pin_string in key_map_right.keys():
-    pin_number = "GP" + pin_string[1:]
+    pin_number = "GP" + pin_string
     pin = getattr(board, pin_number)
     pin = digitalio.DigitalInOut(pin)
     pin.direction = digitalio.Direction.INPUT
     pin.pull = digitalio.Pull.UP
-    key_map_right[pin_string] = (pin, key_map_right[pin_string][0], key_map_right[pin_string][1])
+    keycode, pressed, timestamp = key_map_right[pin_string]
+    key_map_right[pin_string] = (pin, keycode, pressed, timestamp)
 
 while True:
-    if clock_pin.value:
-        data = str(receive_data(freq))
-        key = key_map_left[str(data)][0]
-        kbd.press(key)
-        time.sleep(0.02)
-        kbd.release(key)das ist ein kleiner test
-        
-
-    for pin_string, (pin, keycode, pressed) in key_map_right.items():
-        if not pin.value:  # Pin is active low
-            if not pressed:
-                print(f"Pin {pin_string} pressed, keycode: {keycode}")
+    current_time = time.monotonic_ns()  # Get the current time in nanoseconds
+    
+    for pin_string, (pin, keycode, pressed, timestamp) in key_map_right.items():
+        if not pin.value:  # Key is pressed (pin is low)
+            if not pressed:  # key was not previously pressed
                 kbd.press(keycode)
-                key_map_right[pin_string] = (pin, keycode, True)
-        else:
-            if pressed:
-                print(f"Pin {pin_string} released, keycode: {keycode}")
+                key_map_right[pin_string] = (pin, keycode, True, current_time)
+            else:  # Key is already pressed
+                if current_time - timestamp > 50 * 1_000_000:  # 50ms in nanoseconds
+                    kbd.press(keycode)  # Continuously send key press
+                    key_map_right[pin_string] = (pin, keycode, True, current_time)  # Update timestamp to current time
+        else:  # Key is released
+            if pressed:  # Key was previously pressed
                 kbd.release(keycode)
-                key_map_right[pin_string] = (pin, keycode, False)
-    
-    
+                key_map_right[pin_string] = (pin, keycode, False, 0)
+
