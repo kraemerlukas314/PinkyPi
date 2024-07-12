@@ -1,7 +1,7 @@
 # PinkyPi
 Ortho Staggered ergo split keyboard using Raspberry Pi Pico \
 \
-<img src="images/Concept%20PinkyPi%20without%20cables.png" alt="PinkyPi Concept" width="753" height="423"> \
+<img src="images/Concept%20PinkyPi%20without%20cables.png" alt="PinkyPi Concept" width="749" height="418"> \
 \
 <img src="images/PinkyPi.png" alt="PinkyPi Keyboard" width="744" height="556">
 
