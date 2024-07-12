@@ -1,5 +1,6 @@
 # PinkyPi
-Ortho Staggered ergo split keyboard using Raspberry Pi Pico
+Ortho Staggered ergo split keyboard using Raspberry Pi Pico \
+![PinkyPi](images/Concept%20PinkyPi%20without%20cables.png)
 
 # Flash CircuitPython firmware:
 0. Connect Pico to PC while holding down the "Bootsel" button
